@@ -42,7 +42,7 @@ export function Navbar() {
           </SignedOut>
           <SignedIn>
             <SignOutButton>
-              <div className='flex cursor-pointer'>
+              <div className='flex cursor-pointer p-2'>
                 <Image
                   src={Logout}
                   alt='logout'
@@ -52,6 +52,9 @@ export function Navbar() {
               </div>
             </SignOutButton>
           </SignedIn>
+          <div className="p-2">
+            <UserButton afterSignOutUrl="/"/>
+          </div>
       </header>
     </nav>
   )

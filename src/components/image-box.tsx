@@ -3,15 +3,14 @@ import LeafSVG from "@/components/assets/Leaf";
 import { Button } from "@/components/ui/button";
 import { ChangeEvent, FormEvent, useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
-import Image from "next/image";
 import { useQuery } from "@tanstack/react-query";
 import { ReloadIcon } from "@radix-ui/react-icons";
-import { ResultData } from "@/lib/types"; // Import the ResultData interface
-import Result from "./result";
+import { ResultData } from "@/lib/types"; 
 
 export function ImageBox() {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imageURL, setImageURL] = useState<string | undefined>();
+  const [name, setName] = useState<string>("");
   const { toast } = useToast();
 
   // Function to handle image upload
@@ -37,8 +36,11 @@ export function ImageBox() {
     queryFn: () => {
       const formData = new FormData();
       formData.append("image", imageFile!);
+      formData.append("NAME", name); // Append the name field
 
-      return fetch("http://localhost:8000/submit", {
+      console.log('FormData:', formData.get('image'), formData.get('NAME'));
+
+      return fetch("http://localhost:8000/api/image-prediction/", {
         method: "POST",
         body: formData,
       }).then((res) => {
@@ -55,7 +57,14 @@ export function ImageBox() {
   // Handle form submission
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    if (!imageFile) return;
+    if (!imageFile || !name) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Please provide an image and your name.",
+      });
+      return;
+    }
     try {
       const result = await refetch(); // Trigger refetch of data from API
 
@@ -88,6 +97,15 @@ export function ImageBox() {
     <section className="mt-8 md:mt-4">
       <form encType="multipart/form-data" method="post" onSubmit={handleSubmit}>
         <div className="flex flex-col items-center">
+          {/* Input field for user name */}
+          <input
+            type="text"
+            placeholder="Enter your name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className="mb-4 p-2 border rounded"
+            required
+          />
           {/* Upload image UI */}
           <label htmlFor="plant-image" className="cursor-pointer">
             <div className="relative w-72 mt-4 flex items-center justify-center aspect-square mx-auto border-2 dark:border-white border-black border-dashed rounded-lg">
